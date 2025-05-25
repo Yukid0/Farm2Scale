@@ -1,530 +1,66 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body {
-      background: #222;
-      color: #fff;
-      font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      position: relative;
-      height: 100vh;
-      overflow: hidden;
-      text-align: center;
-    }
-    canvas {
-      border: 2px solid #444;
-      display: block;
-      margin: 20px auto;
-      image-rendering: pixelated;
-    }
-    #inventory {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      text-align: left;
-      background: rgba(0,0,0,0.4);
-      padding: 8px 12px;
-      border-radius: 6px;
-      user-select: none;
-      min-width: 180px;
-    }
-    #dayEnergyContainer {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      text-align: right;
-      background: rgba(0,0,0,0.4);
-      padding: 8px 12px;
-      border-radius: 6px;
-      user-select: none;
-      line-height: 1.5em;
-      min-width: 110px;
-    }
-    #toolSelector {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.4);
-      padding: 10px 15px;
-      border-radius: 8px;
-      user-select: none;
-    }
-    .tool-button {
-      margin: 0 8px;
-      padding: 8px 15px;
-      cursor: pointer;
-      background-color: #555;
-      border: none;
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
-    .tool-button.selected {
-      background-color: #888;
-    }
-    .tool-button:focus {
-      outline: none;
-      box-shadow: 0 0 8px #ccc;
-    }
-
-    /* Boutique */
-    #shopOverlay,
-    #seedShopOverlay {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #111a;
-      border: 3px solid #888;
-      border-radius: 10px;
-      padding: 20px 30px;
-      color: white;
-      min-width: 300px;
-      display: none;
-      z-index: 100;
-      user-select: none;
-    }
-    #shopOverlay h2,
-    #seedShopOverlay h2 {
-      margin-top: 0;
-      margin-bottom: 12px;
-    }
-    #shopInventory,
-    #seedShopInventory {
-      background: #222;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-    }
-    #shopInventory span,
-    #seedShopInventory span {
-      font-weight: bold;
-      margin-right: 5px;
-    }
-    #shopButtons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-    #shopButtons button {
-      padding: 8px 16px;
-      background: #555;
-      border: none;
-      color: white;
-      font-weight: bold;
-      font-size: 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    #shopButtons button:disabled {
-      background: #333;
-      cursor: not-allowed;
-    }
-    #closeShopBtn {
-      margin-top: 15px;
-      background: #a33;
-      width: 100%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farm & Scale - Clicker Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="images/coin.png" type="image/png">
+    <meta name="description" content="Un jeu clicker simple et addictif où vous collectez des pièces pour acheter des améliorations">
 </head>
 <body>
-
-<canvas id="gameCanvas" width="640" height="640"></canvas>
-
-<div id="inventory">
-  🌾 Graines de blé : <span id="wheatCount">5</span><br />
-  💧 Eau : <span id="waterLevel">5</span><br />
-  🍞 Blé récolté : <span id="harvestCount">0</span>
-</div>
-
-<div id="dayEnergyContainer">
-  📅 Jour : <span id="dayCount">1</span><br />
-  ⚡ Énergie : <span id="energyCount">5</span><br />
-  💰 Argent : <span id="moneyCount">0</span>
-</div>
-
-<div id="toolSelector">
-  Outil sélectionné :
-  <button class="tool-button" id="hoeBtn">Houe</button>
-  <button class="tool-button" id="wateringCanBtn">Arrosoir</button>
-  <button class="tool-button" id="seedBtn">Graines</button>
-</div>
-
-<!-- Boutique -->
-<div id="shopOverlay" role="dialog" aria-modal="true" aria-labelledby="shopTitle">
-  <h2 id="shopTitle">Boutique de Vente</h2>
-  <div id="shopInventory">
-    <div>🍞 Blé récolté disponible : <span id="shopWheatStored">0</span></div>
-  </div>
-  <div id="shopButtons">
-    <button id="depositBtn">Déposer 1 blé</button>
-    <button id="withdrawBtn">Retirer 1 blé</button>
-  </div>
-  <button id="closeShopBtn">Fermer la boutique</button>
-</div>
-
-<!-- Boutique d'Achat -->
-<div id="seedShopOverlay" role="dialog" aria-modal="true" aria-labelledby="seedShopTitle" style="display: none;">
-  <h2 id="seedShopTitle">Boutique de Graines</h2>
-  <div id="seedShopInventory">
-    <div>🌾 Prix des graines : 2 pièces</div>
-    <div>💰 Votre argent : <span id="shopMoneyCount">0</span></div>
-  </div>
-  <div id="shopButtons">
-    <button id="buySeedsBtn">Acheter 1 graine</button>
-  </div>
-  <button id="closeSeedShopBtn">Fermer la boutique</button>
-</div>
-
-<script>
-  const canvas = document.getElementById("gameCanvas");
-  const ctx = canvas.getContext("2d");
-
-  const wheatCounter = document.getElementById("wheatCount");
-  const waterCounter = document.getElementById("waterLevel");
-  const harvestCounter = document.getElementById("harvestCount");
-  const energyCounter = document.getElementById("energyCount");
-  const dayCounter = document.getElementById("dayCount");
-  const moneyCounter = document.getElementById("moneyCount");
-
-  const hoeBtn = document.getElementById("hoeBtn");
-  const wateringCanBtn = document.getElementById("wateringCanBtn");
-  const seedBtn = document.getElementById("seedBtn");
-
-  // Boutique elements
-  const shopOverlay = document.getElementById("shopOverlay");
-  const shopWheatStoredSpan = document.getElementById("shopWheatStored");
-  const depositBtn = document.getElementById("depositBtn");
-  const withdrawBtn = document.getElementById("withdrawBtn");
-  const closeShopBtn = document.getElementById("closeShopBtn");
-  
-  // Boutique d'achat elements
-  const seedShopOverlay = document.getElementById("seedShopOverlay");
-  const shopMoneyCount = document.getElementById("shopMoneyCount");
-  const buySeedsBtn = document.getElementById("buySeedsBtn");
-  const closeSeedShopBtn = document.getElementById("closeSeedShopBtn");
-
-  const TILE_SIZE = 32;
-  const MAP_ROWS = 20;
-  const MAP_COLS = 20;
-
-  let selectedTool = "hoe";
-
-  let dayCount = 1;
-
-  const player = {
-    x: 1,
-    y: 1,
-    color: "blue",
-    inventory: {
-      wheatSeeds: 5,
-      water: 5,
-      wheatHarvested: 0,
-      energy: 5,
-      money: 0
-    }
-  };
-
-  // Boutique stockage (blé déposés)
-  let shopStorage = {
-    wheatStored: 0
-  };
-
-  const map = [];
-  for (let y = 0; y < MAP_ROWS; y++) {
-    const row = [];
-    for (let x = 0; x < MAP_COLS; x++) {
-      const isWaterTile = x === 0 && y === 0;
-      row.push({ 
-        type: isWaterTile ? "water" : "grass", 
-        isTilled: false,
-        isWatered: false,
-        hasCrop: false,
-        isGrown: false,
-        growTimeoutId: null
-      });
-    }
-    map.push(row);
-  }
-
-  // Cases spéciales
-  map[5][5].type = "yellow";
-  map[10][10].type = "red";   // Case rouge = boutique
-  map[15][15].type = "purple";
-
-  function drawTile(x, y, tile) {
-    if (tile.type === "yellow") {
-      ctx.fillStyle = "yellow";
-    } else if (tile.type === "red") {
-      ctx.fillStyle = "red";
-    } else if (tile.type === "purple") {
-      ctx.fillStyle = "purple";
-    } else if (tile.type === "water") {
-      ctx.fillStyle = "#00f";
-    } else if (tile.type === "grass") {
-      ctx.fillStyle = "#7CFC00";
-    } else if (tile.type === "tilled") {
-      ctx.fillStyle = tile.isWatered ? "#8B4513" : "#deb887";
-    } else {
-      ctx.fillStyle = "#999";
-    }
-    ctx.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-
-    if (tile.hasCrop) {
-      ctx.fillStyle = tile.isGrown ? "white" : "green";
-      ctx.fillRect(x * TILE_SIZE + 10, y * TILE_SIZE + 10, 12, 12);
-    }
-  }
-
-  function drawPlayer() {
-    ctx.fillStyle = player.color;
-    ctx.fillRect(player.x * TILE_SIZE + 4, player.y * TILE_SIZE + 4, 24, 24);
-  }
-
-  function render() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let y = 0; y < MAP_ROWS; y++) {
-      for (let x = 0; x < MAP_COLS; x++) {
-        drawTile(x, y, map[y][x]);
-      }
-    }
-    drawPlayer();
-    updateUI();
-  }
-
-  function updateUI() {
-    wheatCounter.textContent = player.inventory.wheatSeeds;
-    waterCounter.textContent = player.inventory.water;
-    harvestCounter.textContent = player.inventory.wheatHarvested;
-    energyCounter.textContent = player.inventory.energy;
-    dayCounter.textContent = dayCount;
-    moneyCounter.textContent = player.inventory.money;
-
-    shopWheatStoredSpan.textContent = shopStorage.wheatStored;
-
-    hoeBtn.classList.toggle("selected", selectedTool === "hoe");
-    wateringCanBtn.classList.toggle("selected", selectedTool === "wateringCan");
-    seedBtn.classList.toggle("selected", selectedTool === "seeds");
-  }
-
-  function updatePlayerPosition(dx, dy) {
-    const newX = player.x + dx;
-    const newY = player.y + dy;
-    if (newX >= 0 && newX < MAP_COLS && newY >= 0 && newY < MAP_ROWS) {
-      player.x = newX;
-      player.y = newY;
-    }
-  }
-
-  function startGrowthTimer(tile) {
-    if (tile.growTimeoutId) {
-      clearTimeout(tile.growTimeoutId);
-    }
-    tile.isGrown = false;
-    tile.growTimeoutId = null;
-    tile.plantDay = dayCount;
-    render();
-  }
-
-  function consumeEnergy() {
-    if (player.inventory.energy > 0) {
-      player.inventory.energy--;
-      return true;
-    }
-    return false;
-  }
-
-  function openShop() {
-    shopOverlay.style.display = "block";
-    // Focus premier bouton pour accessibilité
-    depositBtn.focus();
-  }
-  function closeShop() {
-    shopOverlay.style.display = "none";
-    render();
-  }
-
-  function openSeedShop() {
-    seedShopOverlay.style.display = "block";
-    shopMoneyCount.textContent = player.inventory.money;
-    // Focus premier bouton pour accessibilité
-    buySeedsBtn.focus();
-  }
-  
-  function closeSeedShop() {
-    seedShopOverlay.style.display = "none";
-    render();
-  }
-
-  function interact(keyPressed) {
-    const tile = map[player.y][player.x];
-
-    // Case violette: incrémente le jour si on appuie sur 'a'
-    if (tile.type === "purple" && keyPressed === "a") {
-      dayCount++;
-      player.inventory.energy = 5; // reset énergie
-      
-      // Vérifier si des cultures doivent pousser (après 3 jours)
-      for (let y = 0; y < MAP_ROWS; y++) {
-        for (let x = 0; x < MAP_COLS; x++) {
-          const cropTile = map[y][x];
-          
-          // Si la parcelle a une culture et est arrosée, compte ce jour pour la croissance
-          if (cropTile.hasCrop && !cropTile.isGrown && cropTile.isWatered) {
-            // Incrémente le compteur de jours de croissance
-            cropTile.growthDays = (cropTile.growthDays || 0) + 1;
+    <div class="game-container">
+        <div class="header">
+            <h1>Farm & Scale</h1>
+            <div class="resources">
+                <div class="resource">
+                    <span id="coins">0</span>
+                    <span class="resource-label">Pièces</span>
+                </div>
+                <div class="resource">
+                    <span id="coins-per-second">0</span>
+                    <span class="resource-label">Pièces/sec</span>
+                </div>
+                <div class="resource">
+                    <span id="coins-per-click">1</span>
+                    <span class="resource-label">Pièces/clic</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="clicker-area">
+                <div id="clicker" class="clicker-button">
+                    <img src="images/coin.png" alt="Pièce" id="coin-image">
+                </div>
+                <div class="click-info">Cliquez pour gagner des pièces<br>Double-cliquez pour un bonus!</div>
+            </div>
             
-            // Si la plante a reçu 3 jours d'arrosage, elle est prête
-            if (cropTile.growthDays >= 3) {
-              cropTile.isGrown = true;
-            }
-          }
-          
-          // Réinitialiser l'arrosage des parcelles
-          cropTile.isWatered = false;
-        }
-      }
+            <div class="upgrades-container">
+                <h2>Améliorations</h2>
+                <div id="upgrades-list"></div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <button id="save-button">Sauvegarder</button>
+            <button id="stats-button">Statistiques</button>
+            <button id="reset-button">Réinitialiser</button>
+        </div>
+    </div>
+    
+    <div id="stats-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Statistiques</h2>
+            <div class="stats-content">
+                <p>Pièces totales gagnées: <span id="total-coins">0</span></p>
+                <p>Nombre de clics: <span id="total-clicks">0</span></p>
+                <p>Temps de jeu: <span id="play-time">0 minutes</span></p>
+            </div>
+        </div>
+    </div>
 
-      // Vendre les blés déposés dans la boutique
-      if (shopStorage.wheatStored > 0) {
-        const pricePerWheat = 10; // prix fixe par blé vendu
-        const earnings = shopStorage.wheatStored * pricePerWheat;
-        player.inventory.money += earnings;
-        shopStorage.wheatStored = 0;
-        alert(`Vous avez vendu vos blés pour ${earnings} pièces d'argent.`);
-      }
-
-      render();
-      return;
-    }
-
-    // Case jaune: ouvre la boutique d'achat de graines
-    if (tile.type === "yellow" && keyPressed === "a") {
-      openSeedShop();
-      return;
-    }
-
-    // Case rouge ouvre boutique
-    if (tile.type === "red" && keyPressed === "a") {
-      openShop();
-      return;
-    }
-
-    if (tile.type === "water" && selectedTool === "wateringCan") {
-      player.inventory.water = 5;
-      render();
-      return;
-    }
-
-    if (selectedTool === "hoe") {
-      if (!consumeEnergy()) return;
-
-      if (tile.hasCrop && tile.isGrown) {
-        tile.hasCrop = false;
-        tile.isGrown = false;
-        if (tile.growTimeoutId) {
-          clearTimeout(tile.growTimeoutId);
-          tile.growTimeoutId = null;
-        }
-        player.inventory.wheatHarvested++;
-      } else if (tile.type === "grass") {
-        tile.type = "tilled";
-        tile.isTilled = true;
-      }
-      render();
-    } else if (selectedTool === "wateringCan") {
-      if (player.inventory.water > 0) {
-        if (!consumeEnergy()) return;
-        if (tile.type === "tilled") {
-          tile.isWatered = true;
-          player.inventory.water--;
-        }
-        render();
-      }
-    } else if (selectedTool === "seeds") {
-      if (!consumeEnergy()) return;
-      if (tile.type === "tilled" && !tile.hasCrop && player.inventory.wheatSeeds > 0) {
-        tile.hasCrop = true;
-        tile.isGrown = false;
-        player.inventory.wheatSeeds--;
-        startGrowthTimer(tile);
-        render();
-      }
-    }
-  }
-
-  // Gestion clavier
-  window.addEventListener("keydown", (e) => {
-    if (shopOverlay.style.display === "block" || seedShopOverlay.style.display === "block") {
-      // Navigation boutique
-      if (e.key === "Escape") {
-        closeShop();
-        closeSeedShop();
-      }
-      return; // bloquer commandes du jeu si boutique ouverte
-    }
-
-    if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-      e.preventDefault();
-      if (e.key === "ArrowUp") updatePlayerPosition(0, -1);
-      else if (e.key === "ArrowDown") updatePlayerPosition(0, 1);
-      else if (e.key === "ArrowLeft") updatePlayerPosition(-1, 0);
-      else if (e.key === "ArrowRight") updatePlayerPosition(1, 0);
-      render();
-    } else if (e.key === "a") {
-      interact("a");
-    }
-  });
-
-  // Boutons outils
-  hoeBtn.addEventListener("click", () => { selectedTool = "hoe"; updateUI(); });
-  wateringCanBtn.addEventListener("click", () => { selectedTool = "wateringCan"; updateUI(); });
-  seedBtn.addEventListener("click", () => { selectedTool = "seeds"; updateUI(); });
-
-  // Boutons boutique
-  depositBtn.addEventListener("click", () => {
-    if (player.inventory.wheatHarvested > 0) {
-      player.inventory.wheatHarvested--;
-      shopStorage.wheatStored++;
-      updateUI();
-    }
-  });
-  withdrawBtn.addEventListener("click", () => {
-    if (shopStorage.wheatStored > 0) {
-      shopStorage.wheatStored--;
-      player.inventory.wheatHarvested++;
-      updateUI();
-    }
-  });
-  closeShopBtn.addEventListener("click", () => {
-    closeShop();
-  });
-
-  // Boutons boutique d'achat
-  buySeedsBtn.addEventListener("click", () => {
-    if (player.inventory.money >= 2) {
-      player.inventory.money -= 2;
-      player.inventory.wheatSeeds += 1;
-      shopMoneyCount.textContent = player.inventory.money;
-      updateUI();
-    }
-  });
-  
-  closeSeedShopBtn.addEventListener("click", () => {
-    closeSeedShop();
-  });
-
-  render();
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>
