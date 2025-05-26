@@ -3,64 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Farm & Scale - Clicker Game</title>
+    <title>Space Clicker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="images/coin.png" type="image/png">
-    <meta name="description" content="Un jeu clicker simple et addictif où vous collectez des pièces pour acheter des améliorations">
 </head>
-<body>
-    <div class="game-container">
-        <div class="header">
-            <h1>Farm & Scale</h1>
-            <div class="resources">
-                <div class="resource">
-                    <span id="coins">0</span>
-                    <span class="resource-label">Pièces</span>
-                </div>
-                <div class="resource">
-                    <span id="coins-per-second">0</span>
-                    <span class="resource-label">Pièces/sec</span>
-                </div>
-                <div class="resource">
-                    <span id="coins-per-click">1</span>
-                    <span class="resource-label">Pièces/clic</span>
-                </div>
-            </div>
+<body class="bg-gradient-to-b from-indigo-900 to-purple-900 text-white min-h-screen overflow-x-hidden relative">
+    <!-- Étoiles de fond -->
+    <div id="stars-container"></div>
+    
+
+    <div class="container mx-auto px-4 py-8 flex flex-col items-center">
+        <div class="flex items-center gap-4 mb-4">
+            <i class="fas fa-star text-yellow-300 text-3xl"></i>
+            <div id="counter" class="text-4xl font-bold text-yellow-300">0</div>
         </div>
+        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-center bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 to-pink-400">
+            Space Clicker
+        </h1>
+        <p class="text-lg mb-8 text-purple-200">Cliquez pour collecter des étoiles!</p>
         
-        <div class="main-content">
-            <div class="clicker-area">
-                <div id="clicker" class="clicker-button">
-                    <img src="images/coin.png" alt="Pièce" id="coin-image">
+        <div class="flex flex-col md:flex-row items-center justify-center gap-8 w-full">
+            <!-- Section principale du clicker -->
+            <div class="flex flex-col items-center">
+                <div class="relative mb-4">
+                    <div id="clicker" class="clickable planet w-48 h-48 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 shadow-xl shadow-purple-500/30 flex items-center justify-center cursor-pointer hover:shadow-purple-500/50 transition-all duration-300">
+                        <div class="w-40 h-40 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 shadow-inner flex items-center justify-center">
+                            <div class="w-32 h-32 rounded-full bg-gradient-to-br from-purple-300 to-pink-300 shadow-inner flex items-center justify-center">
+                                <i class="fas fa-star text-yellow-300 text-5xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="click-value" class="text-center mt-4 text-lg font-semibold text-yellow-200">
+                        +1 étoile par clic
+                    </div>
                 </div>
-                <div class="click-info">Cliquez pour gagner des pièces<br>Double-cliquez pour un bonus!</div>
+                
+                <div class="bg-purple-800/50 backdrop-blur-sm rounded-xl p-4 mb-6 w-full max-w-md">
+                    <h2 class="text-xl font-semibold mb-3 text-center">Statistiques</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-purple-900/50 p-3 rounded-lg">
+                            <div class="text-sm text-purple-300">Étoiles totales</div>
+                            <div id="total-stars" class="text-xl font-bold">0</div>
+                        </div>
+                        <div class="bg-purple-900/50 p-3 rounded-lg">
+                            <div class="text-sm text-purple-300">Étoiles/seconde</div>
+                            <div id="stars-per-second" class="text-xl font-bold">0</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             
-            <div class="upgrades-container">
-                <h2>Améliorations</h2>
-                <div id="upgrades-list"></div>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <button id="save-button">Sauvegarder</button>
-            <button id="stats-button">Statistiques</button>
-            <button id="reset-button">Réinitialiser</button>
-        </div>
-    </div>
-    
-    <div id="stats-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <h2>Statistiques</h2>
-            <div class="stats-content">
-                <p>Pièces totales gagnées: <span id="total-coins">0</span></p>
-                <p>Nombre de clics: <span id="total-clicks">0</span></p>
-                <p>Temps de jeu: <span id="play-time">0 minutes</span></p>
+            <!-- Section des améliorations -->
+            <div class="bg-purple-800/50 backdrop-blur-sm rounded-xl p-4 w-full max-w-md">
+                <h2 class="text-xl font-semibold mb-3 text-center">Améliorations</h2>
+                <div class="upgrades-wrapper">
+                    <div id="upgrades" class="space-y-3">
+                        <!-- Les améliorations seront ajoutées ici par JavaScript -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="game.js"></script>
 </body>
 </html>
