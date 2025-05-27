@@ -1,9 +1,20 @@
 // État du jeu
 const gameState = {
-    stars: 0,
-    totalStars: 0,
+    stars: 20000,
+    totalStars: 20000,
     clickValue: 1,
     starsPerSecond: 0,
+    powerUp: {
+        doubleClick: {
+            unlocked: false,
+            active: false,
+            cost: 10000,
+            duration: 15000, // 15 secondes
+            cooldown: 300000, // 5 minutes
+            lastUsed: 0,
+            timeRemaining: 0
+        }
+    },
     upgrades: [
         {
             id: 1,
@@ -30,99 +41,99 @@ const gameState = {
         {
             id: 3,
             name: "Astronome",
-            description: "Génère 5 étoiles × niveau toutes les 5 secondes",
+            description: "Génère 7 étoiles × niveau toutes les 5 secondes",
             baseCost: 100,
             cost: 100,
             owned: 0,
-            baseStars: 5,
+            baseStars: 7,
             icon: "fa-telescope",
             type: "passive"
         },
         {
             id: 4,
             name: "Explorateur Orbital",
-            description: "Génère 15 étoiles × niveau toutes les 7 secondes",
+            description: "Génère 25 étoiles × niveau toutes les 7 secondes",
             baseCost: 600,
             cost: 600,
             owned: 0,
-            baseStars: 15,
+            baseStars: 25,
             icon: "fa-satellite",
             type: "passive"
         },
         {
             id: 5,
             name: "Colonisateur Stellaire",
-            description: "Génère 55 étoiles × niveau toutes les 10 secondes",
+            description: "Génère 80 étoiles × niveau toutes les 10 secondes",
             baseCost: 3000,
             cost: 3000,
             owned: 0,
-            baseStars: 55,
+            baseStars: 80,
             icon: "fa-rocket",
             type: "passive"
         },
         {
             id: 6,
             name: "Cartographe Galactique",
-            description: "Génère 180 étoiles × niveau toutes les 12 secondes",
+            description: "Génère 250 étoiles × niveau toutes les 12 secondes",
             baseCost: 10000,
             cost: 10000,
             owned: 0,
-            baseStars: 180,
+            baseStars: 250,
             icon: "fa-map-marked-alt",
             type: "passive"
         },
         {
             id: 7,
             name: "Maître du Vide",
-            description: "Génère 600 étoiles × niveau toutes les 15 secondes",
+            description: "Génère 900 étoiles × niveau toutes les 15 secondes",
             baseCost: 40000,
             cost: 40000,
             owned: 0,
-            baseStars: 600,
+            baseStars: 900,
             icon: "fa-hand-sparkles",
             type: "passive"
         },
         {
             id: 8,
             name: "Éveilleur de Trous Noirs",
-            description: "Génère 1800 étoiles × niveau toutes les 20 secondes",
+            description: "Génère 3000 étoiles × niveau toutes les 20 secondes",
             baseCost: 200000,
             cost: 200000,
             owned: 0,
-            baseStars: 1800,
+            baseStars: 3000,
             icon: "fa-circle-notch",
             type: "passive"
         },
         {
             id: 9,
             name: "Forgeur de Planètes",
-            description: "Génère 6000 étoiles × niveau toutes les 25 secondes",
+            description: "Génère 10000 étoiles × niveau toutes les 25 secondes",
             baseCost: 750000,
             cost: 750000,
             owned: 0,
-            baseStars: 6000,
+            baseStars: 10000,
             icon: "fa-globe",
             type: "passive"
         },
         {
             id: 10,
             name: "Architecte Céleste",
-            description: "Génère 20000 étoiles × niveau toutes les 30 secondes",
+            description: "Génère 40000 étoiles × niveau toutes les 30 secondes",
             baseCost: 3000000,
             cost: 3000000,
             owned: 0,
-            baseStars: 20000,
+            baseStars: 40000,
             icon: "fa-drafting-compass",
             type: "passive"
         },
         {
             id: 11,
             name: "Destructeur de Soleil",
-            description: "Génère 70000 étoiles × niveau toutes les 35 secondes",
+            description: "Génère 120000 étoiles × niveau toutes les 35 secondes",
             baseCost: 15000000,
             cost: 15000000,
             owned: 0,
-            baseStars: 70000,
+            baseStars: 120000,
             icon: "fa-sun",
             type: "passive"
         }
@@ -138,15 +149,15 @@ const progressionSystem = {
     fillTimes: {
         // ID de l'amélioration: temps en ms (tous multipliés par 4x5x3x1.5=90 pour ralentir)
         2: 270000,   // Astrologue: 1 étoile/3sec
-        3: 450000,   // Astronome: 5 étoiles/5sec
-        4: 630000,   // Explorateur Orbital: 15 étoiles/7sec
-        5: 900000,   // Colonisateur Stellaire: 45 étoiles/10sec
-        6: 1080000,  // Cartographe Galactique: 140 étoiles/12sec
-        7: 1350000,  // Maître du Vide: 420 étoiles/15sec
-        8: 1800000,  // Éveilleur de Trous Noirs: 1300 étoiles/20sec
-        9: 2250000,  // Forgeur de Planètes: 4000 étoiles/25sec
-        10: 2700000, // Architecte Céleste: 12000 étoiles/30sec
-        11: 3150000  // Destructeur de Soleil: 40000 étoiles/35sec
+        3: 450000,   // Astronome: 7 étoiles/5sec
+        4: 630000,   // Explorateur Orbital: 25 étoiles/7sec
+        5: 900000,   // Colonisateur Stellaire: 80 étoiles/10sec
+        6: 1080000,  // Cartographe Galactique: 250 étoiles/12sec
+        7: 1350000,  // Maître du Vide: 900 étoiles/15sec
+        8: 1800000,  // Éveilleur de Trous Noirs: 3000 étoiles/20sec
+        9: 2250000,  // Forgeur de Planètes: 10000 étoiles/25sec
+        10: 2700000, // Architecte Céleste: 40000 étoiles/30sec
+        11: 3150000  // Destructeur de Soleil: 120000 étoiles/35sec
     },
     
     // Initialiser ou réinitialiser une barre de progression
@@ -302,6 +313,9 @@ function updateDisplay() {
         starsPerSecondElement.textContent = formatNumber(gameState.starsPerSecond);
     }
     
+    // Mettre à jour l'affichage du power-up
+    updatePowerUpDisplay();
+    
     document.getElementById('click-value').textContent = `+${formatNumber(gameState.clickValue)} étoile${gameState.clickValue > 1 ? 's' : ''} par clic`;
     
     // Ajouter une animation au compteur
@@ -312,6 +326,162 @@ function updateDisplay() {
     
     // Mettre à jour l'affichage de la production
     updateProductionDisplay();
+}
+
+// Fonction pour mettre à jour l'affichage du power-up
+function updatePowerUpDisplay() {
+    const powerUp = gameState.powerUp.doubleClick;
+    const powerUpButton = document.getElementById('power-up-button');
+    const powerUpStatus = document.getElementById('power-up-status');
+    const powerUpTimer = document.getElementById('power-up-timer');
+    const powerUpCooldown = document.getElementById('power-up-cooldown');
+    const powerUpProgress = document.getElementById('power-up-progress');
+    
+    // Mettre à jour le bouton d'achat/activation
+    if (!powerUp.unlocked) {
+        // Power-up pas encore débloqué
+        powerUpButton.textContent = `${formatNumber(powerUp.cost)} étoiles`;
+        powerUpButton.disabled = gameState.stars < powerUp.cost;
+        powerUpButton.classList.toggle('opacity-50', gameState.stars < powerUp.cost);
+        powerUpButton.classList.toggle('cursor-not-allowed', gameState.stars < powerUp.cost);
+    } else {
+        // Power-up débloqué, vérifier s'il est actif ou en cooldown
+        const now = Date.now();
+        
+        if (powerUp.active) {
+            // Power-up actif
+            powerUpButton.innerHTML = `<i class="fas fa-bolt mr-1"></i>Actif`;
+            powerUpButton.disabled = true;
+            powerUpButton.classList.add('opacity-50', 'cursor-not-allowed', 'bg-green-600');
+            powerUpButton.classList.remove('bg-yellow-600', 'hover:bg-yellow-500');
+            
+            // Afficher le temps restant
+            const timeRemaining = Math.ceil(powerUp.timeRemaining / 1000);
+            powerUpTimer.textContent = `${timeRemaining}s`;
+            
+            // Mettre à jour la barre de progression
+            const progressPercentage = (powerUp.timeRemaining / powerUp.duration) * 100;
+            powerUpProgress.style.width = `${progressPercentage}%`;
+            powerUpProgress.classList.add('bg-green-500');
+            powerUpProgress.classList.remove('bg-red-500');
+            
+            // Ajouter la classe pour l'effet visuel
+            document.body.classList.add('power-up-active');
+        } else if (now - powerUp.lastUsed < powerUp.cooldown) {
+            // Power-up en cooldown
+            powerUpButton.innerHTML = `<i class="fas fa-hourglass-half mr-1"></i>Recharge`;
+            powerUpButton.disabled = true;
+            powerUpButton.classList.add('opacity-50', 'cursor-not-allowed', 'bg-red-600');
+            powerUpButton.classList.remove('bg-yellow-600', 'hover:bg-yellow-500');
+            
+            // Afficher le temps de cooldown restant
+            const cooldownRemaining = Math.ceil((powerUp.cooldown - (now - powerUp.lastUsed)) / 1000);
+            powerUpCooldown.textContent = `${cooldownRemaining}s`;
+            
+            // Mettre à jour la barre de progression du cooldown
+            const progressPercentage = ((powerUp.cooldown - (now - powerUp.lastUsed)) / powerUp.cooldown) * 100;
+            powerUpProgress.style.width = `${progressPercentage}%`;
+            powerUpProgress.classList.add('bg-red-500');
+            powerUpProgress.classList.remove('bg-green-500');
+            
+            // Enlever la classe pour l'effet visuel
+            document.body.classList.remove('power-up-active');
+        } else {
+            // Power-up prêt à être utilisé
+            powerUpButton.innerHTML = `<i class="fas fa-bolt mr-1"></i>Activer`;
+            powerUpButton.disabled = false;
+            powerUpButton.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-red-600');
+            powerUpButton.classList.add('bg-yellow-600', 'hover:bg-yellow-500', 'power-up-ready');
+            
+            // Enlever la classe pour l'effet visuel
+            document.body.classList.remove('power-up-active');
+        }
+    }
+    
+    // Afficher ou masquer la section de statut
+    if (powerUp.unlocked) {
+        powerUpStatus.classList.remove('hidden');
+    } else {
+        powerUpStatus.classList.add('hidden');
+    }
+}
+
+// Fonction pour activer le power-up
+function activatePowerUp() {
+    const powerUp = gameState.powerUp.doubleClick;
+    
+    if (!powerUp.unlocked) {
+        // Débloquer le power-up
+        if (gameState.stars >= powerUp.cost) {
+            gameState.stars -= powerUp.cost;
+            powerUp.unlocked = true;
+            
+            // Jouer un son d'achat (simulé par une animation)
+            const container = document.getElementById('power-up-container');
+            if (container) {
+                container.classList.add('bg-yellow-500/20');
+                setTimeout(() => {
+                    container.classList.remove('bg-yellow-500/20');
+                }, 300);
+            }
+        }
+    } else {
+        // Activer le power-up si pas en cooldown
+        const now = Date.now();
+        if (now - powerUp.lastUsed >= powerUp.cooldown) {
+            // Activer l'effet
+            powerUp.active = true;
+            powerUp.timeRemaining = powerUp.duration;
+            
+            // Doubler la valeur de clic actuelle
+            const originalClickValue = gameState.clickValue;
+            gameState.clickValue *= 2;
+            
+            // Créer un effet d'activation
+            document.body.classList.add('power-up-active');
+            
+            // Créer un effet de flash
+            const flash = document.createElement('div');
+            flash.className = 'fixed inset-0 bg-yellow-300 opacity-40 z-50 pointer-events-none';
+            document.body.appendChild(flash);
+            setTimeout(() => {
+                flash.remove();
+            }, 200);
+            
+            // Programmer la fin de l'effet
+            setTimeout(() => {
+                powerUp.active = false;
+                powerUp.lastUsed = Date.now();
+                gameState.clickValue = originalClickValue;
+                document.body.classList.remove('power-up-active');
+                updateDisplay();
+            }, powerUp.duration);
+        }
+    }
+    
+    updateDisplay();
+}
+
+// Fonction pour mettre à jour le power-up à chaque frame
+function updatePowerUp() {
+    const powerUp = gameState.powerUp.doubleClick;
+    
+    if (powerUp.active) {
+        powerUp.timeRemaining -= 16; // 16ms = environ 60fps
+        if (powerUp.timeRemaining <= 0) {
+            powerUp.active = false;
+            powerUp.lastUsed = Date.now();
+            
+            // Restaurer la valeur de clic d'origine
+            gameState.clickValue = 1 + gameState.upgrades[0].owned * gameState.upgrades[0].baseStars;
+            document.body.classList.remove('power-up-active');
+        }
+    }
+    
+    // Mettre à jour l'affichage si le power-up est débloqué
+    if (powerUp.unlocked) {
+        updatePowerUpDisplay();
+    }
 }
 
 // Afficher les améliorations
@@ -337,7 +507,7 @@ function renderUpgrades() {
             productionInfo = `
                 <div class="text-xs text-purple-200 mt-1">
                     ${ratePerSecond}/sec
-                    <span class="text-xs text-purple-400">(${totalProduction} étoiles/${formatSeconds(originalFillTime)})</span>
+                    <span class="text-xs text-purple-400">(${upgrade.baseStars} étoiles × ${upgrade.owned}/${formatSeconds(originalFillTime)})</span>
                 </div>
             `;
             
@@ -358,13 +528,20 @@ function renderUpgrades() {
             `;
         }
         
+        // Mise à jour de la description pour refléter les valeurs actuelles de baseStars
+        let description = upgrade.description;
+        if (upgrade.type === "passive") {
+            // Remplacer les valeurs dans la description par les valeurs actuelles
+            description = description.replace(/\d+ étoiles?/, `${upgrade.baseStars} étoiles`);
+        }
+        
         upgradeElement.innerHTML = `
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <i class="fas ${upgrade.icon} text-xl text-yellow-300"></i>
                     <div>
                         <h3 class="font-semibold">${upgrade.name}${upgrade.owned > 0 ? ` lvl.${upgrade.owned}` : ''}</h3>
-                        <p class="text-xs text-purple-300">${upgrade.description}</p>
+                        <p class="text-xs text-purple-300">${description}</p>
                         ${productionInfo}
                     </div>
                 </div>
@@ -600,6 +777,9 @@ function updateProgressBars() {
 function gameLoop() {
     // Mettre à jour les barres de progression qui génèrent des étoiles
     updateProgressBars();
+    
+    // Mettre à jour le power-up
+    updatePowerUp();
 }
 
 // Fonction pour créer une animation d'étoile
@@ -686,6 +866,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Gestion du clic
     document.getElementById('clicker').addEventListener('click', handleClick);
+    
+    // Gestion du power-up
+    document.getElementById('power-up-button').addEventListener('click', activatePowerUp);
     
     // Boucle de jeu (mise à jour à 60fps pour animation parfaitement fluide)
     setInterval(gameLoop, 16);

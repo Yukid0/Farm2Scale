@@ -129,6 +129,33 @@
     border-radius: 10px;
 }
 
+/* Styles pour le power-up */
+@keyframes powerUpActive {
+    0% { filter: drop-shadow(0 0 3px rgba(252, 211, 77, 0.5)); }
+    50% { filter: drop-shadow(0 0 8px rgba(252, 211, 77, 0.8)); }
+    100% { filter: drop-shadow(0 0 3px rgba(252, 211, 77, 0.5)); }
+}
+
+.power-up-active #clicker {
+    animation: powerUpActive 1s infinite;
+    border: 2px solid #fcd34d;
+}
+
+.power-up-active #click-value {
+    color: #fcd34d;
+    font-weight: bold;
+}
+
+.power-up-ready {
+    animation: pulse 2s infinite;
+}
+
+#power-up-button {
+    min-width: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
 /* Styles pour la barre de progression */
 .progress-bar-container {
     width: 100%;

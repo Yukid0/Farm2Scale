@@ -51,6 +51,28 @@
                             <div id="stars-per-second" class="text-xl font-bold">0</div>
                         </div>
                     </div>
+                    
+                    <!-- Section du Power-up -->
+                    <div id="power-up-container" class="mt-4 bg-purple-900/50 p-3 rounded-lg">
+                        <div class="flex justify-between items-start">
+                            <div class="max-w-[60%]">
+                                <div class="text-sm text-purple-300">Pouvoir Stellaire</div>
+                                <div class="text-xs text-purple-200">Double les étoiles par clic pendant 15s</div>
+                            </div>
+                            <button id="power-up-button" class="bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1 rounded-lg text-sm opacity-50 cursor-not-allowed" disabled>
+                                <i class="fas fa-bolt mr-1"></i>10K étoiles
+                            </button>
+                        </div>
+                        <div id="power-up-status" class="text-xs text-purple-200 mt-1 hidden">
+                            <div class="flex justify-between">
+                                <span>Actif: <span id="power-up-timer" class="text-yellow-300">0s</span></span>
+                                <span>Cooldown: <span id="power-up-cooldown" class="text-red-300">0s</span></span>
+                            </div>
+                            <div class="progress-bar-container mt-1">
+                                <div id="power-up-progress" class="progress-bar bg-yellow-500" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -58,8 +80,8 @@
             <div class="bg-purple-800/50 backdrop-blur-sm rounded-xl p-4 w-full max-w-md">
                 <h2 class="text-xl font-semibold mb-3 text-center">Améliorations</h2>
                 <div class="upgrades-wrapper">
-                    <div id="upgrades" class="space-y-3">
-                        <!-- Les améliorations seront ajoutées ici par JavaScript -->
+                <div id="upgrades" class="space-y-3">
+                    <!-- Les améliorations seront ajoutées ici par JavaScript -->
                     </div>
                 </div>
             </div>
